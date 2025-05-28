@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ReservaList from './components/ReservaList';
-import ApartamentoList from './components/ApartamentoList'; // caso tenha
-import CriarReserva from './components/CriarReserva'; // caso tenha
+import ApartamentoList from './components/ApartamentoList';
+import CriarReserva from './components/CriarReserva';
 
 function App() {
   return (
