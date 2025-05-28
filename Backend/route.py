@@ -41,4 +41,5 @@ def listar_reservas():
             }
         })
     json_data = json.dumps(resultado, ensure_ascii=False, indent=2,sort_keys=False)
+    print(json_data)
     return Response(json_data, mimetype='application/json; charset=utf-8')
