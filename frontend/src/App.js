@@ -1,12 +1,19 @@
-import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ReservaList from './components/ReservaList';
+import ApartamentoList from './components/ApartamentoList'; // caso tenha
+import CriarReserva from './components/CriarReserva'; // caso tenha
 
 function App() {
   return (
-    <div className="App">
-      <h1>Gestão de Reservas</h1>
-      <ReservaList />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<ReservaList />} />
+        <Route path="/apartamentos" element={<ApartamentoList />} />
+         <Route path="/reservas" element={<ReservaList />} />
+         <Route path="/apartamento/:id/criar" element={<CriarReserva />} />
+
+      </Routes>
+    </BrowserRouter>
   );
 }
 

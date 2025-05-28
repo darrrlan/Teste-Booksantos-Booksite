@@ -5,3 +5,4 @@ flask-cors
 Faker
 
 npm install axios
+npm install react-router-dom
