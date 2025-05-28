@@ -159,3 +159,58 @@ def criar_reserva():
             ),
             500,
         )
+        
+@bp.route("/filtro",methods = ["GET"])
+def filtro():
+
+        cidade = request.args.get("cidade", type=str)
+        inicio = request.args.get("inicio", type=str)
+        fim = request.args.get("fim", type=str)
+        
+        print(cidade)
+        
+        query = Reservation.query.join(Apartment)
+        
+        if cidade:
+            query = query.filter(Apartment.city.ilike(f"%{cidade}%"))
+            
+        if inicio and fim:
+            query = query.filter(
+                Reservation.checkout_date >= inicio,
+                Reservation.checkin_date <= fim,
+            )
+            
+        reservas = query.all()
+        
+        resultado = []
+        
+        for r in reservas:
+            resultado.append({
+            "apartment": {
+                    "id": r.apartment.id,
+                    "title": r.apartment.title,
+                    "city": r.apartment.city,
+                    "state": r.apartment.state,
+                    "max_guests": r.apartment.max_guests,
+                    "daily_rate": r.apartment.daily_rate,
+                },
+            "contact": {
+                    "id": r.contact.id,
+                    "name": r.contact.name,
+                    "email": r.contact.email,
+                    "phone": r.contact.phone,
+                    "type": r.contact.type,
+                    "document": r.contact.document,
+                },
+            "reserva": {
+                "id": r.id,
+                "checkin": r.checkin_date.isoformat(),
+                "checkout": r.checkout_date.isoformat(),
+                "guests": r.guests,
+                "total_price": float(r.total_price),
+                "channel": r.channel,
+                },
+            }
+            )
+        json_data = json.dumps(resultado, ensure_ascii=False, indent=2, sort_keys=False)
+        return Response(json_data, mimetype="application/json; charset=utf-8")
