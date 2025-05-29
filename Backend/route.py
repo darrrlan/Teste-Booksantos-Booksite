@@ -1,6 +1,7 @@
 from flask import Blueprint, Response, json, request
 from models import Reservation, Contact, Apartment, db
-from datetime import datetime
+from datetime import datetime, timedelta
+from sqlalchemy import func
 
 
 bp = Blueprint("routes", __name__)
@@ -214,3 +215,52 @@ def filtro():
             )
         json_data = json.dumps(resultado, ensure_ascii=False, indent=2, sort_keys=False)
         return Response(json_data, mimetype="application/json; charset=utf-8")
+    
+@bp.route("/dashboard", methods = ["GET"])
+def dashboard():
+    
+    hoje = datetime.utcnow()
+    # print(hoje) #debug
+    ultimo_mes = hoje - timedelta(days=30)
+    informacao = Reservation.query.filter(Reservation.checkin_date >= ultimo_mes).all()
+    total = [0,0,0,0]
+    
+    cidades_resultado = (
+        db.session.query(Apartment.city, func.count(Reservation.id).label("total_reservas"))
+        .join(Apartment, Reservation.apartment_id == Apartment.id)
+        .filter(Reservation.checkin_date >= ultimo_mes)
+        .group_by(Apartment.city)
+        .order_by(func.count(Reservation.id).desc())
+        .all()
+    )
+
+    cidades = [{"cidade": cidade, "total_reservas": total} for cidade, total in cidades_resultado]
+    # print(cidades) debug
+
+    for r in informacao:
+       total[0] += 1
+       
+       if r.channel == ("airbnb"):
+           total[1] += r.total_price
+       elif r.channel == ("booking.com"):
+           total[2] += r.total_price
+       else:
+           total[3] += r.total_price
+    
+    resultado = []
+    
+    resultado.append(
+        {
+        "Informações" : {
+            "total_reserva": total[0],
+            "total_price_airbnb":total[1],
+            "total_price_booking.com":total[2],
+            "total_price_direto":total[3],
+            "cidades_mais_reservas": cidades
+            
+        }
+        }  
+    )
+    json_data = json.dumps(resultado, ensure_ascii=False, indent=2, sort_keys=False)
+    return Response(json_data, mimetype="application/json; charset=utf-8")
+    
