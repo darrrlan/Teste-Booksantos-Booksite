@@ -1,4 +1,4 @@
-from flask import Blueprint, Response, json, request
+from flask import Blueprint, Response, json, request, redirect
 from models import Reservation, Contact, Apartment, Login, db
 from datetime import datetime, timedelta
 from sqlalchemy import func, and_, or_, not_
@@ -312,7 +312,7 @@ def dashboard():
     
     
 @bp.route("/cadastro", methods=["POST"])
-def login():
+def cadastro():
     data = request.get_json()
     print("Dados recebidos:", data)
 
@@ -328,7 +328,7 @@ def login():
         db.session.add(novo_contato)
         db.session.flush()  
         
-        senha_bytes = data["senha"].encode('utf-8')  # converte para bytes
+        senha_bytes = data["senha"].encode('utf-8')
         hashed_senha = bcrypt.hashpw(senha_bytes, bcrypt.gensalt())
 
         nova_cadastro = Login(
@@ -340,7 +340,7 @@ def login():
 
         db.session.commit()
 
-        msg = {"mensagem": "login criado com sucesso!"}
+        msg = {"mensagem": "Cadastro criado com sucesso!"}
         return (
             Response(
                 json.dumps(msg, ensure_ascii=False),
@@ -367,5 +367,39 @@ def login():
             ),
             400
         )
+        
+@bp.route("/login", methods=["GET"])
+def login():
+    email = request.args.get("email", type=str)
+    senha = request.args.get("senha", type=str)
+    
+    if email == "admin" and senha == "admin":
+       
+        return {
+        "mensagem": "Login admin realizado com sucesso!",
+        "redirect": "http://localhost:3000/dashboard"
+    }, 200
 
-   
+    try:
+        usuario = Login.query.filter_by(email=email).first()
+
+        if not usuario:
+            raise Exception("Usuário não encontrado.")
+
+        senha_correta = bcrypt.checkpw(senha.encode("utf-8"), usuario.senha.encode("utf-8"))
+
+        if senha_correta:
+            msg = {"mensagem": "Login realizado com sucesso!"}
+            return Response(
+                json.dumps(msg, ensure_ascii=False),
+                content_type="application/json; charset=utf-8",
+            ), 200
+        else:
+            raise Exception("Senha incorreta.")
+
+    except Exception as e:
+        msg = {"mensagem": str(e) or "Login ou senha incorreto"}
+        return Response(
+            json.dumps(msg, ensure_ascii=False),
+            content_type="application/json; charset=utf-8",
+        ), 400

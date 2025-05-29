@@ -54,6 +54,7 @@ function Cadastro() {
           placeholder="Email"
           value={form.email}
           onChange={handleChange}
+          required
         />
         <input
           name="senha"
@@ -61,24 +62,28 @@ function Cadastro() {
           type="password"
           value={form.senha}
           onChange={handleChange}
+          required
         />
         <input
           name="name"
           placeholder="Nome"
           value={form.name}
           onChange={handleChange}
+          required
         />
         <input
           name="phone"
           placeholder="Telefone"
           value={form.phone}
           onChange={handleChange}
+          required
         />
         <select
           name="type"
           placeholder="Tipo"
           value={form.type}
           onChange={handleChange}
+          required
         >
           <option value="">Tipo</option>
           <option value="individual">Individual</option>
@@ -87,8 +92,12 @@ function Cadastro() {
         <input
           name="document"
           placeholder="Documento"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          title="Digite apenas números"
           value={form.document}
           onChange={handleChange}
+          required
         />
         <button type="submit">Cadastrar</button>
       </form>

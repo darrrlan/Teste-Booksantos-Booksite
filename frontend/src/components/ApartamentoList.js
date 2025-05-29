@@ -56,7 +56,7 @@ function ApartamentoList() {
     buscarApartamentos();
   }, []);
 
-  if (loading) return
+  if (loading) return 
 
   return (
     <div>
