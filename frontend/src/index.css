@@ -1,13 +1,199 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #fdfdfd;
+  color: #1a1a1a;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+
+h1 {
+  font-size: 36px;
+  font-weight: 800;
+  color: #0d1b2a;
+  padding: 40px 60px 0;
+  text-align: left;
+  margin-left: 190px;
+}
+
+.filtro-container {
+  background-color: #f1f3f5;
+  border-radius: 16px;
+  padding: 30px;
+  max-width: 1000px;
+  margin: 20px auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.filtro-container label {
+  flex: 1 1 200px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+.filtro-input {
+  width: 100%;
+  padding: 14px 18px 14px 42px;
+  border-radius: 10px;
+  border: none;
+  font-size: 16px;
+  background-color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.filtro-button {
+  background-color: #1f4e79;
+  color: #fff;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.filtro-input:focus {
+  outline: none;
+  border: 2px solid #0077cc;
+}
+
+.filtro-button:hover {
+  background-color: #0f2e52;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.grid-item,
+.card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.grid-item:hover,
+.card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #222;
+}
+
+.Cidade_estado {
+  margin-top: 4px;
+  margin-bottom: 12px;
+  color: #666;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+h3 {
+  margin: 6px 0;
+  color: #444;
+  font-size: 16px;
+}
+
+.criar-reserva {
+  max-width: 480px;
+  margin: 40px auto;
+  padding: 24px;
+  background: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+.criar-reserva h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #222;
+  font-weight: 600;
+}
+
+.criar-reserva form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.criar-reserva label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #444;
+}
+
+.criar-reserva input[type="date"],
+.criar-reserva input[type="number"],
+.criar-reserva select {
+  padding: 10px 12px;
+  border: 1.8px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.criar-reserva input[type="date"]:focus,
+.criar-reserva input[type="number"]:focus,
+.criar-reserva select:focus {
+  border-color: #3f51b5;
+  outline: none;
+  box-shadow: 0 0 6px rgba(63, 81, 181, 0.4);
+}
+
+.criar-reserva button[type="submit"] {
+  padding: 12px 0;
+  background-color: #3f51b5;
+  color: white;
+  font-weight: 700;
+  font-size: 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+}
+
+.criar-reserva button[type="submit"]:hover {
+  background-color: #303f9f;
+}
+
+.criar-reserva select option:first-child {
+  color: #999;
+}
+
+@media (max-width: 520px) {
+  .criar-reserva {
+    margin: 20px 16px;
+    padding: 16px;
+  }
+}
+
+.msg_erro {
+  color: #721c24;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #f5c6cb;
+  background-color: #f8d7da ;
 }

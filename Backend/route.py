@@ -1,7 +1,7 @@
 from flask import Blueprint, Response, json, request
 from models import Reservation, Contact, Apartment, db
 from datetime import datetime, timedelta
-from sqlalchemy import func
+from sqlalchemy import func, and_, or_, not_
 
 
 bp = Blueprint("routes", __name__)
@@ -117,8 +117,8 @@ def criar_reserva():
         
         reservas_conflitantes = Reservation.query.filter(
              Reservation.apartment_id == id,
-             Reservation.checkout_date > data['checkout'],  
-             Reservation.checkin_date < data['checkin_date'],
+             Reservation.checkout_date >= data['checkout'],  
+             Reservation.checkin_date <= data['checkin'],
          ).all()
 
         if reservas_conflitantes:
@@ -216,6 +216,52 @@ def filtro():
         json_data = json.dumps(resultado, ensure_ascii=False, indent=2, sort_keys=False)
         return Response(json_data, mimetype="application/json; charset=utf-8")
     
+from sqlalchemy import and_
+
+@bp.route("/filtro_sem_reserva", methods=["GET"])
+def filtro_sem_reserva():
+    cidade = request.args.get("cidade", type=str)
+    inicio = request.args.get("inicio", type=str)
+    fim = request.args.get("fim", type=str)
+
+    query = Apartment.query
+
+    if cidade:
+        query = query.filter(Apartment.city.ilike(f"%{cidade}%"))
+
+    if inicio and fim:
+        subquery = (
+            db.session.query(Reservation.apartment_id)
+            .filter(
+                Reservation.checkout_date > inicio,
+                Reservation.checkin_date < fim
+            )
+            .subquery()
+        )
+
+        query = query.filter(~Apartment.id.in_(subquery))
+
+    apartamentos_disponiveis = query.all()
+
+    resultado = []
+    for apt in apartamentos_disponiveis:
+        resultado.append({
+            "apartment": {
+                "id": apt.id,
+                "title": apt.title,
+                "city": apt.city,
+                "state": apt.state,
+                "max_guests": apt.max_guests,
+                "daily_rate": apt.daily_rate,
+            }
+        })
+
+    json_data = json.dumps(resultado, ensure_ascii=False, indent=2, sort_keys=False)
+    return Response(json_data, mimetype="application/json; charset=utf-8")
+
+
+
+    
 @bp.route("/dashboard", methods = ["GET"])
 def dashboard():
     
@@ -254,7 +300,7 @@ def dashboard():
         "Informações" : {
             "total_reserva": total[0],
             "total_price_airbnb":total[1],
-            "total_price_booking.com":total[2],
+            "total_price_booking":total[2],
             "total_price_direto":total[3],
             "cidades_mais_reservas": cidades
             

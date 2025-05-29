@@ -9,6 +9,7 @@ function CriarReserva() {
 
   const [apartamentos, setApartamentos] = useState([]);
   const [contatos, setContatos] = useState([]);
+  const [erro, setErro] = useState("");
   const [form, setForm] = useState({
     apartment_id: "",
     contact_id: "",
@@ -38,15 +39,15 @@ function CriarReserva() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    setErro("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const dias = calcularTotalDias(form.checkin, form.checkout);
-
     if (dias === 0) {
-      alert("As datas de check-in e check-out são inválidas.");
+      setErro("O período da reserva é inválido.");
       return;
     }
 
@@ -68,17 +69,24 @@ function CriarReserva() {
 
     try {
       await axios.post("http://localhost:5000/criarreserva", payload);
-      alert("Reserva criada com sucesso!");
       navigate("/reservas");
     } catch (err) {
       console.error("Erro ao criar reserva:", err);
-      alert("Erro ao criar reserva");
+      const mensagem = err.response?.data?.erro || "Erro ao criar reserva.";
+      setErro(mensagem);
     }
   };
 
   return (
-    <div>
+    <div className="criar-reserva">
       <h2>Criar Reserva</h2>
+
+      {erro && (
+        <div className="msg_erro">
+          {erro}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit}>
         <input type="hidden" name="apartment_id" value={form.apartment_id} />
 
