@@ -56,7 +56,7 @@ function ApartamentoList() {
     buscarApartamentos();
   }, []);
 
-  if (loading) return <p>Carregando apartamentos...</p>;
+  if (loading) return
 
   return (
     <div>

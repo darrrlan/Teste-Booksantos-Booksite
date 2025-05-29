@@ -30,6 +30,21 @@ class Reservation(db.Model):
     guests = db.Column(db.Integer, nullable=False)
     total_price = db.Column(db.Numeric(10,2), nullable=False)
     channel = db.Column(db.String(20), nullable=False)
+    
+    
 
     apartment = db.relationship('Apartment', backref='reservations')
     contact = db.relationship('Contact', backref='reservations')
+    
+class Login(db.Model):
+    __tablename__ = 'login'
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), nullable=False)
+    senha = db.Column(db.String(100), nullable=False)
+    contact_id = db.Column(db.Integer, db.ForeignKey('contacts.id'), nullable=False)
+    
+    contact = db.relationship('Contact', backref='login')
+        
+        
+        
+    

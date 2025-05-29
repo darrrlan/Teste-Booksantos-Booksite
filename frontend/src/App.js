@@ -3,6 +3,7 @@ import ReservaList from './components/ReservaList';
 import ApartamentoList from './components/ApartamentoList';
 import CriarReserva from './components/CriarReserva';
 import Dashboard from './components/Dashboard';
+import Cadastro from './components/Cadastro';
 
 function App() {
   return (
@@ -10,9 +11,10 @@ function App() {
       <Routes>
         <Route path="/" element={<ReservaList />} />
         <Route path="/apartamentos" element={<ApartamentoList />} />
-         <Route path="/reservas" element={<ReservaList />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-         <Route path="/apartamento/:id/criar" element={<CriarReserva />} />
+        <Route path="/reservas" element={<ReservaList />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/cadastro" element={<Cadastro />} />
+        <Route path="/apartamento/:id/criar" element={<CriarReserva />} />
 
       </Routes>
     </BrowserRouter>

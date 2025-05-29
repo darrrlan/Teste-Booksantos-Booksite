@@ -30,3 +30,10 @@ CREATE TABLE reservations (
     channel VARCHAR(20) NOT NULL CHECK (channel IN ('airbnb', 'booking.com', 'direto')),
     CONSTRAINT chk_dates CHECK (checkout_date > checkin_date)
 );
+
+-- Tabela de login
+CREATE TABLE reservations (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    senha VARCHAR(100) NOT NULL,
+);

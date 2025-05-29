@@ -1,7 +1,8 @@
 from flask import Blueprint, Response, json, request
-from models import Reservation, Contact, Apartment, db
+from models import Reservation, Contact, Apartment, Login, db
 from datetime import datetime, timedelta
 from sqlalchemy import func, and_, or_, not_
+import bcrypt
 
 
 bp = Blueprint("routes", __name__)
@@ -215,8 +216,7 @@ def filtro():
             )
         json_data = json.dumps(resultado, ensure_ascii=False, indent=2, sort_keys=False)
         return Response(json_data, mimetype="application/json; charset=utf-8")
-    
-from sqlalchemy import and_
+
 
 @bp.route("/filtro_sem_reserva", methods=["GET"])
 def filtro_sem_reserva():
@@ -310,3 +310,62 @@ def dashboard():
     json_data = json.dumps(resultado, ensure_ascii=False, indent=2, sort_keys=False)
     return Response(json_data, mimetype="application/json; charset=utf-8")
     
+    
+@bp.route("/cadastro", methods=["POST"])
+def login():
+    data = request.get_json()
+    print("Dados recebidos:", data)
+
+    try:
+
+        novo_contato = Contact(
+            name=data["name"],
+            email=data["email"],
+            phone=data["phone"],
+            type=data["type"],
+            document=data["document"]
+        )
+        db.session.add(novo_contato)
+        db.session.flush()  
+        
+        senha_bytes = data["senha"].encode('utf-8')  # converte para bytes
+        hashed_senha = bcrypt.hashpw(senha_bytes, bcrypt.gensalt())
+
+        nova_cadastro = Login(
+            email=data["email"],
+            senha=hashed_senha.decode('utf-8'),
+            contact_id=novo_contato.id
+        )
+        db.session.add(nova_cadastro)
+
+        db.session.commit()
+
+        msg = {"mensagem": "login criado com sucesso!"}
+        return (
+            Response(
+                json.dumps(msg, ensure_ascii=False),
+                content_type="application/json; charset=utf-8",
+            ),
+            201
+        )
+
+    except Exception as e:
+        db.session.rollback()
+        
+        if 'contacts_document_key' in str(e):
+            erro_msg = "Documento já cadastrado. Por favor, use outro."
+        elif 'contacts_email_key' in str(e):
+            erro_msg = "E-mail já cadastrado. Tente recuperar sua conta."
+        else:
+            erro_msg = "Erro ao criar o cadastro"
+        print(f"Erro ao criar reserva: {e}")
+        msg = {"erro": erro_msg}
+        return (
+            Response(
+                json.dumps(msg, ensure_ascii=False),
+                content_type="application/json; charset=utf-8",
+            ),
+            400
+        )
+
+   

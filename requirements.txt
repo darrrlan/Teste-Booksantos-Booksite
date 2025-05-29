@@ -3,6 +3,8 @@ Flask-SQLAlchemy
 psycopg2-binary
 flask-cors
 Faker
+bcrypt
+
 
 npm install axios
 npm install react-router-dom
