@@ -93,7 +93,7 @@ Rode o script SQL para criar as tabelas:
 ```
 - Atualize as configurações do banco em `Backend/app.py`
 ```bash
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:admin@localhost:5432/gestao_reservas"
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://<usuário>:<senha>@localhost:5432/gestao_reservas"
 ```
 - (Opcional) Rode `Backend/seed.py` para popular com dados iniciais
 
