@@ -60,7 +60,7 @@ A interface web foi construída com **React**, incluindo:
 
 ### Pré-requisitos
 
-- Python 3.10+
+- Python 3.13+
 - Node.js e npm 20+
 - Banco de dados relacional usado PostgreSQL
 
