@@ -121,7 +121,7 @@ Acesse a aplicação em `http://localhost:3000`
 Para acessar a Dashboard, é necessário realizar login com as seguintes credenciais padrão:
 
 ```bash
-Usuário: admin
+Email: admin
 Senha: admin
 ```
 
