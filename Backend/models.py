@@ -1,3 +1,7 @@
+# Modelos de tabelas que devem existir no banco de dados.
+# Isso garante que, mesmo que alguma tabela seja removida acidentalmente,
+# o programa continuará funcionando sem substituir nem sobrescrever dados existentes.
+
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()

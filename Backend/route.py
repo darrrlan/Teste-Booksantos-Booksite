@@ -7,7 +7,7 @@ import bcrypt
 
 bp = Blueprint("routes", __name__)
 
-
+#rota da api
 @bp.route("/")
 def home():
     data = {"message": "API de Gestão do Booksite"}
@@ -17,7 +17,7 @@ def home():
     )
     return response
 
-
+#Rota para acesso da reservas com o método GET
 @bp.route("/reservas", methods=["GET"])
 def listar_reservas():
     reservas = Reservation.query.all()
@@ -54,7 +54,7 @@ def listar_reservas():
     json_data = json.dumps(resultado, ensure_ascii=False, indent=2, sort_keys=False)
     return Response(json_data, mimetype="application/json; charset=utf-8")
 
-
+#Rota para acesso de apartamentos com o método GET
 @bp.route("/apartamentos", methods=["GET"])
 def listar_apartment():
     apartamentos = Apartment.query.all()
@@ -75,7 +75,7 @@ def listar_apartment():
     json_data = json.dumps(resultado, ensure_ascii=False, indent=2, sort_keys=False)
     return Response(json_data, mimetype="application/json; charset=utf-8")
 
-
+#Rota para acesso de contatos com o método GET
 @bp.route("/contatos", methods=["GET"])
 def listar_contact():
     contatos = Contact.query.all()
@@ -96,27 +96,27 @@ def listar_contact():
     json_data = json.dumps(resultado, ensure_ascii=False, indent=2, sort_keys=False)
     return Response(json_data, mimetype="application/json; charset=utf-8")
 
-
+#Rota para criação de reservas com o método POST
 @bp.route("/criarreserva", methods=["POST"])
 def criar_reserva():
     data = request.get_json()
     id = data["apartment_id"]
-    apartamento = Apartment.query.get(id)
+    apartamento = Apartment.query.get(id)# pega o id que vem direto do front e pesquisa o apartamento
     
     try:
         guests = int(data["guests"])
-        if guests > apartamento.max_guests:
+        if guests > apartamento.max_guests:# confere se o número de pessoas bate com o permitido
             return Response(
                 json.dumps(
                     {
                         "erro": f"O número máximo de hóspedes permitido é {apartamento.max_guests}"
                     }
                 ),
-                status=400,
+                status=400,#erro
                 mimetype="application/json",
             )
         
-        reservas_conflitantes = Reservation.query.filter(
+        reservas_conflitantes = Reservation.query.filter( #Confere se já não existe alguma reseva na mesma data
              Reservation.apartment_id == id,
              Reservation.checkout_date >= data['checkout'],  
              Reservation.checkin_date <= data['checkin'],
@@ -125,11 +125,11 @@ def criar_reserva():
         if reservas_conflitantes:
              return Response(
                  json.dumps({"erro": "Já existe uma reserva para este apartamento no período informado." }),
-                 status=400,
+                 status=400,#erro
                  mimetype="application/json",
              )
         
-        nova_reserva = Reservation(
+        nova_reserva = Reservation(# Caso não apresente erra, cria uma vova reseva e manda para o banco de dados
             apartment_id=id,
             contact_id=data["contact_id"],
             checkin_date=data['checkin'],
@@ -139,8 +139,8 @@ def criar_reserva():
             total_price=data["total_price"],
         )
 
-        db.session.add(nova_reserva)
-        db.session.commit()
+        db.session.add(nova_reserva)#adiciona no banco
+        db.session.commit()# e persite os dados, salvando no banco de dados
 
         msg = {"mensagem": "Reserva criada com sucesso!"}
         return (
@@ -148,7 +148,7 @@ def criar_reserva():
                 json.dumps(msg, ensure_ascii=False),
                 content_type="application/json; charset=utf-8",
             ),
-            201,
+            201,#sucesso
         )
 
     except Exception as e:
@@ -159,35 +159,36 @@ def criar_reserva():
                 json.dumps(msg, ensure_ascii=False),
                 content_type="application/json; charset=utf-8",
             ),
-            500,
+            500,#eero
         )
         
+#Rota para filtros de busca com método GET  
 @bp.route("/filtro",methods = ["GET"])
 def filtro():
 
-        cidade = request.args.get("cidade", type=str)
-        inicio = request.args.get("inicio", type=str)
-        fim = request.args.get("fim", type=str)
+        cidade = request.args.get("cidade", type=str)# recebe como parametro pelo frontend
+        inicio = request.args.get("inicio", type=str)# recebe como parametro pelo frontend
+        fim = request.args.get("fim", type=str)# recebe como parametro pelo frontend
         
-        print(cidade)
+        #print(cidade) #debug
         
-        query = Reservation.query.join(Apartment)
+        query = Reservation.query.join(Apartment) # faz um query com os Apartamentos
         
         if cidade:
-            query = query.filter(Apartment.city.ilike(f"%{cidade}%"))
+            query = query.filter(Apartment.city.ilike(f"%{cidade}%"))# filtra por cidade o query
             
         if inicio and fim:
-            query = query.filter(
+            query = query.filter(# filtra por data de chekin e de chekout
                 Reservation.checkout_date >= inicio,
                 Reservation.checkin_date <= fim,
             )
             
-        reservas = query.all()
+        reservas = query.all()# reserva recebe tudo que está de acordo com o filtro
         
         resultado = []
         
         for r in reservas:
-            resultado.append({
+            resultado.append({# monta o json para ser enviado para o front end
             "apartment": {
                     "id": r.apartment.id,
                     "title": r.apartment.title,
@@ -215,23 +216,23 @@ def filtro():
             }
             )
         json_data = json.dumps(resultado, ensure_ascii=False, indent=2, sort_keys=False)
-        return Response(json_data, mimetype="application/json; charset=utf-8")
+        return Response(json_data, mimetype="application/json; charset=utf-8")#retorna o json por api
 
-
+#Rota para filtros de busca que não tem reserva para o usuário com método GET 
 @bp.route("/filtro_sem_reserva", methods=["GET"])
 def filtro_sem_reserva():
-    cidade = request.args.get("cidade", type=str)
-    inicio = request.args.get("inicio", type=str)
-    fim = request.args.get("fim", type=str)
+    cidade = request.args.get("cidade", type=str)# recebe como parametro pelo frontend
+    inicio = request.args.get("inicio", type=str)# recebe como parametro pelo frontend
+    fim = request.args.get("fim", type=str)# recebe como parametro pelo frontend
 
-    query = Apartment.query
+    query = Apartment.query #pega todos os apartemantos
 
     if cidade:
-        query = query.filter(Apartment.city.ilike(f"%{cidade}%"))
+        query = query.filter(Apartment.city.ilike(f"%{cidade}%")) # filtra por cidade escolhida
 
     if inicio and fim:
         subquery = (
-            db.session.query(Reservation.apartment_id)
+            db.session.query(Reservation.apartment_id) # filtra pela data do chekin e chekout e retorna apenas o que estão disponiveis
             .filter(
                 Reservation.checkout_date > inicio,
                 Reservation.checkin_date < fim
@@ -245,7 +246,7 @@ def filtro_sem_reserva():
 
     resultado = []
     for apt in apartamentos_disponiveis:
-        resultado.append({
+        resultado.append({ #monatndo o json dos apartamentos disponiveis
             "apartment": {
                 "id": apt.id,
                 "title": apt.title,
@@ -257,21 +258,21 @@ def filtro_sem_reserva():
         })
 
     json_data = json.dumps(resultado, ensure_ascii=False, indent=2, sort_keys=False)
-    return Response(json_data, mimetype="application/json; charset=utf-8")
+    return Response(json_data, mimetype="application/json; charset=utf-8")# retorna o json em forma de api pro front end
 
 
 
-    
+ # Rota para o dashboard com o método GET   
 @bp.route("/dashboard", methods = ["GET"])
 def dashboard():
     
-    hoje = datetime.utcnow()
+    hoje = datetime.utcnow() # biblioteca que fornece a data de hoje
     # print(hoje) #debug
     ultimo_mes = hoje - timedelta(days=30)
-    informacao = Reservation.query.filter(Reservation.checkin_date >= ultimo_mes).all()
+    informacao = Reservation.query.filter(Reservation.checkin_date >= ultimo_mes).all()# pega as reserva que tem o chekin nos ultimos 30 dias
     total = [0,0,0,0]
     
-    cidades_resultado = (
+    cidades_resultado = (# pega as cidades com mais reservas
         db.session.query(Apartment.city, func.count(Reservation.id).label("total_reservas"))
         .join(Apartment, Reservation.apartment_id == Apartment.id)
         .filter(Reservation.checkin_date >= ultimo_mes)
@@ -286,16 +287,16 @@ def dashboard():
     for r in informacao:
        total[0] += 1
        
-       if r.channel == ("airbnb"):
+       if r.channel == ("airbnb"):# preço total pelo canal airbnb
            total[1] += r.total_price
-       elif r.channel == ("booking.com"):
+       elif r.channel == ("booking.com"):# preço total pelo canal booking.com
            total[2] += r.total_price
-       else:
+       else:# preço total pelo canal direto
            total[3] += r.total_price
     
     resultado = []
     
-    resultado.append(
+    resultado.append(#monta o json do dashboard
         {
         "Informações" : {
             "total_reserva": total[0],
@@ -308,37 +309,37 @@ def dashboard():
         }  
     )
     json_data = json.dumps(resultado, ensure_ascii=False, indent=2, sort_keys=False)
-    return Response(json_data, mimetype="application/json; charset=utf-8")
+    return Response(json_data, mimetype="application/json; charset=utf-8")#envia o json em forma de api para o frontend
     
-    
+#Rota para realização do cadastro pelo método POST 
 @bp.route("/cadastro", methods=["POST"])
 def cadastro():
-    data = request.get_json()
+    data = request.get_json()# recebe a resposta do formulario do front end
     print("Dados recebidos:", data)
 
     try:
 
-        novo_contato = Contact(
+        novo_contato = Contact(#adiciona o contato na tabela de contacts
             name=data["name"],
             email=data["email"],
             phone=data["phone"],
             type=data["type"],
             document=data["document"]
         )
-        db.session.add(novo_contato)
+        db.session.add(novo_contato)#adiciona no banco
         db.session.flush()  
         
-        senha_bytes = data["senha"].encode('utf-8')
+        senha_bytes = data["senha"].encode('utf-8')#criptografa a senha com hash
         hashed_senha = bcrypt.hashpw(senha_bytes, bcrypt.gensalt())
 
-        nova_cadastro = Login(
+        nova_cadastro = Login(# adiciona no banco as credencias de login com relacionamento com o conato do usuário
             email=data["email"],
             senha=hashed_senha.decode('utf-8'),
             contact_id=novo_contato.id
         )
-        db.session.add(nova_cadastro)
+        db.session.add(nova_cadastro)# adiciona no banco
 
-        db.session.commit()
+        db.session.commit()#e persiste o dados no banco
 
         msg = {"mensagem": "Cadastro criado com sucesso!"}
         return (
@@ -346,18 +347,18 @@ def cadastro():
                 json.dumps(msg, ensure_ascii=False),
                 content_type="application/json; charset=utf-8",
             ),
-            201
+            201#sucesso
         )
 
     except Exception as e:
         db.session.rollback()
         
-        if 'contacts_document_key' in str(e):
+        if 'contacts_document_key' in str(e): # erro se existe algum documento igual já que ele é unique
             erro_msg = "Documento já cadastrado. Por favor, use outro."
-        elif 'contacts_email_key' in str(e):
+        elif 'contacts_email_key' in str(e):# erro se existe algum email igual já que ele é unique
             erro_msg = "E-mail já cadastrado. Tente recuperar sua conta."
         else:
-            erro_msg = "Erro ao criar o cadastro"
+            erro_msg = "Erro ao criar o cadastro"#erro
         print(f"Erro ao criar reserva: {e}")
         msg = {"erro": erro_msg}
         return (
@@ -365,41 +366,42 @@ def cadastro():
                 json.dumps(msg, ensure_ascii=False),
                 content_type="application/json; charset=utf-8",
             ),
-            400
+            400#erro
         )
-        
+# Rota para realizar o login pelo método GET      
 @bp.route("/login", methods=["GET"])
 def login():
-    email = request.args.get("email", type=str)
-    senha = request.args.get("senha", type=str)
+    email = request.args.get("email", type=str)# recebe de parametro pelo front
+    senha = request.args.get("senha", type=str)# recebe de parametro pelo front
     
-    if email == "admin" and senha == "admin":
+    if email == "admin" and senha == "admin": # se as credenciais for de admin
        
         return {
         "mensagem": "Login admin realizado com sucesso!",
-        "redirect": "http://localhost:3000/dashboard"
-    }, 200
+        "redirect": "http://localhost:3000/dashboard"# fazer um redirecionamento para o dashboard
+    }, 200#sucesso
 
+    #caso não for admin
     try:
-        usuario = Login.query.filter_by(email=email).first()
+        usuario = Login.query.filter_by(email=email).first()# procura o email no banco
 
         if not usuario:
-            raise Exception("Usuário não encontrado.")
+            raise Exception("Usuário não encontrado.")# se não existe o usuário no banco
 
         senha_correta = bcrypt.checkpw(senha.encode("utf-8"), usuario.senha.encode("utf-8"))
 
-        if senha_correta:
+        if senha_correta:# as credencias estão corretas
             msg = {"mensagem": "Login realizado com sucesso!"}
             return Response(
                 json.dumps(msg, ensure_ascii=False),
                 content_type="application/json; charset=utf-8",
-            ), 200
-        else:
-            raise Exception("Senha incorreta.")
+            ), 200#sucesso
+        else:#senha incorreta
+            raise Exception("Senha incorreta.") #erro
 
     except Exception as e:
         msg = {"mensagem": str(e) or "Login ou senha incorreto"}
         return Response(
             json.dumps(msg, ensure_ascii=False),
             content_type="application/json; charset=utf-8",
-        ), 400
+        ), 400 #erro
