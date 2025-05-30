@@ -61,7 +61,7 @@ A interface web foi construída com **React**, incluindo:
 ### Pré-requisitos
 
 - Python 3.10+
-- Node.js e npm
+- Node.js e npm 20+
 - Banco de dados relacional usado PostgreSQL
 
 ### Passo 1: Clonar o projeto
@@ -110,7 +110,6 @@ python app.py
 ```bash
 cd frontend
 npm install
-npm install axios react-router-dom
 npm start
 ```
 
