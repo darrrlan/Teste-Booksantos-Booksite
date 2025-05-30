@@ -50,6 +50,7 @@ function Cadastro() {
 
       <form onSubmit={handleSubmit}>
         <input
+          type="text"
           name="email"
           placeholder="Email"
           value={form.email}
@@ -65,6 +66,7 @@ function Cadastro() {
           required
         />
         <input
+          type="text"
           name="name"
           placeholder="Nome"
           value={form.name}
@@ -72,8 +74,12 @@ function Cadastro() {
           required
         />
         <input
+          type="integer"
           name="phone"
           placeholder="Telefone"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          title="Digite apenas números"
           value={form.phone}
           onChange={handleChange}
           required
@@ -90,6 +96,7 @@ function Cadastro() {
           <option value="company">Company</option>
         </select>
         <input
+          type="integer"
           name="document"
           placeholder="Documento"
           inputMode="numeric"

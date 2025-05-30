@@ -45,74 +45,84 @@ function ReservaList() {
     buscarReservas();
   }, []);
 
-  if (loading) return <p>Carregando reservas...</p>;
+  if (loading) return
 
   return (
-    <div>
-      <h2>Reservas</h2>
+  <div className="reserva-list-container">
+    <h2>Reservas</h2>
 
-      <div style={{ marginBottom: '20px' }}>
-        <label>
-          Cidade:
-          <input
-            type="text"
-            value={cidade}
-            onChange={e => setCidade(e.target.value)}
-            style={{ marginLeft: '5px' }}
-          />
-        </label>
-        <label style={{ marginLeft: '10px' }}>
-          Início:
-          <input
-            type="date"
-            value={inicio}
-            onChange={e => setInicio(e.target.value)}
-            style={{ marginLeft: '5px' }}
-          />
-        </label>
-        <label style={{ marginLeft: '10px' }}>
-          Fim:
-          <input
-            type="date"
-            value={fim}
-            onChange={e => setFim(e.target.value)}
-            style={{ marginLeft: '5px' }}
-          />
-        </label>
-        <button onClick={buscarReservasFiltradas} style={{ marginLeft: '10px' }}>
-          Filtrar
-        </button>
-        <button onClick={() => {
+    <div className="filtro-container">
+      <label>
+        Cidade:
+        <input
+          type="text"
+          value={cidade}
+          onChange={e => setCidade(e.target.value)}
+          className="filtro-input"
+        />
+      </label>
+
+      <label>
+        Início:
+        <input
+          type="date"
+          value={inicio}
+          onChange={e => setInicio(e.target.value)}
+          className="filtro-input"
+        />
+      </label>
+
+      <label>
+        Fim:
+        <input
+          type="date"
+          value={fim}
+          onChange={e => setFim(e.target.value)}
+          className="filtro-input"
+        />
+      </label>
+
+      <button onClick={buscarReservasFiltradas} className="filtro-button">
+        Filtrar
+      </button>
+
+      <button
+        onClick={() => {
           setCidade('');
           setInicio('');
           setFim('');
           buscarReservas();
-        }} style={{ marginLeft: '10px' }}>
-          Limpar Filtros
-        </button>
-      </div>
-
-      <button onClick={() => navigate('/apartamentos')} style={{ marginBottom: '20px' }}>
-        Ver Apartamentos
+        }}
+        className="filtro-button limpar-button"
+      >
+        Limpar Filtros
       </button>
-
-      {reservas.length === 0 ? (
-        <p>Nenhuma reserva encontrada.</p>
-      ) : (
-        reservas.map((r, index) => (
-          <div key={index} style={{ border: '1px solid #ccc', margin: '10px', padding: '10px' }}>
-            <p><strong>Apartamento:</strong> {r.apartment.title} - {r.apartment.city}/{r.apartment.state}</p>
-            <p><strong>Contato:</strong> {r.contact?.name || 'N/A'} ({r.contact?.email || 'N/A'})</p>
-            <p><strong>Check-in:</strong> {r.reserva.checkin}</p>
-            <p><strong>Check-out:</strong> {r.reserva.checkout}</p>
-            <p><strong>Hóspedes:</strong> {r.reserva.guests}</p>
-            <p><strong>Canal:</strong> {r.reserva.channel}</p>
-            <p><strong>Total:</strong> R$ {r.reserva.total_price}</p>
-          </div>
-        ))
-      )}
     </div>
-  );
+
+    {loading && <p className="loading-text">Carregando reservas...</p>}
+
+    {!loading && reservas.length === 0 && (
+      <p className="no-reservas">Nenhuma reserva encontrada.</p>
+    )}
+
+    {!loading && reservas.length > 0 && reservas.map((r, index) => (
+      <div key={index} className="reserva-card">
+        <p><strong>Apartamento:</strong> {r.apartment.title} - {r.apartment.city}/{r.apartment.state}</p>
+        <p><strong>Contato:</strong> {r.contact?.name || 'N/A'} ({r.contact?.email || 'N/A'})</p>
+        <p><strong>Check-in:</strong> {r.reserva.checkin}</p>
+        <p><strong>Check-out:</strong> {r.reserva.checkout}</p>
+        <p><strong>Hóspedes:</strong> {r.reserva.guests}</p>
+        <p><strong>Canal:</strong> {r.reserva.channel}</p>
+        <p><strong>Total:</strong> R$ {r.reserva.total_price}</p>
+      </div>
+    ))}
+
+    <button type="submit" onClick={() => navigate('/dashboard')} className="dashboard-button">
+      Dashboard
+    </button>
+  </div>
+);
+
 }
 
 export default ReservaList;

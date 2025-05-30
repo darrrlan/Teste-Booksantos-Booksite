@@ -56,7 +56,7 @@ function ApartamentoList() {
     buscarApartamentos();
   }, []);
 
-  if (loading) return 
+  if (loading) return
 
   return (
     <div>
@@ -108,7 +108,7 @@ function ApartamentoList() {
 
       <div className="grid-container">
         {apartamentoList.map((r, index) => (
-          <div
+          <div className="reserva-card"
             key={index}
             style={{
               border: "1px solid #ccc",
